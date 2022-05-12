@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
+typedef struct blocks
+{
+    SDL_Rect block;
+    struct blocks *next;
+}
+blocks;
+
 int main(void)
 {
     int grid_cell_size = 14;
@@ -29,7 +36,11 @@ int main(void)
         printf("error initializing window and/or renderer: %s\n", SDL_GetError());
     }
 
+    blocks *headNode, *n, *list;
+
     int close_requested = 0;
+    int counter = 0;
+    int drawblocks = 0;
     while (!close_requested)
     {
         // process events
@@ -40,6 +51,35 @@ int main(void)
             {
                 case SDL_QUIT:
                     close_requested = 1;
+                case SDL_MOUSEBUTTONDOWN:
+                    // add node to the linked list and then call it
+                    n = malloc(sizeof(blocks));
+                    n->block.x = (event.motion.x / grid_cell_size) * grid_cell_size;
+                    n->block.y = (event.motion.y / grid_cell_size) * grid_cell_size;
+                    n->block.h = grid_cell_size;
+                    n->block.w = grid_cell_size;
+
+                    if (counter == 0)
+                    {
+                        headNode = list = n;
+                        counter = 1;
+                    }
+                    else
+                    {
+                        list->next = n;
+                        list = n;
+                    }
+                    break;
+                case SDL_KEYDOWN:
+                    switch (event.key.keysym.scancode)
+                    {
+                        case SDL_SCANCODE_RETURN:
+                            list->next = NULL;
+                            list = headNode;
+                            drawblocks = 1; 
+                            break;
+                    }
+                    break;
             }
         }
 
@@ -60,6 +100,15 @@ int main(void)
             SDL_RenderDrawLine(rend, 0, y, WIN_W, y);
         }
 
+        // draw the block
+        if (drawblocks)
+        {
+            for (blocks *tmp = list; tmp != NULL; tmp = tmp->next)
+            {
+                SDL_SetRenderDrawColor(rend, grid_cursor_color.r, grid_cursor_color.g, grid_cursor_color.b, grid_cursor_color.a);
+                SDL_RenderFillRect(rend, &tmp->block);
+            }
+        }
         SDL_RenderPresent(rend);
     }
 
