@@ -74,6 +74,7 @@ int main(void)
                     switch (event.key.keysym.scancode)
                     {
                         case SDL_SCANCODE_RETURN:
+                            // finish linked list
                             list->next = NULL;
                             list = headNode;
                             drawblocks = 1; 
@@ -100,7 +101,7 @@ int main(void)
             SDL_RenderDrawLine(rend, 0, y, WIN_W, y);
         }
 
-        // draw the block
+        // draw the blocks
         if (drawblocks)
         {
             for (blocks *tmp = list; tmp != NULL; tmp = tmp->next)
