@@ -58,6 +58,7 @@ int main(void)
                     n->block.y = (event.motion.y / grid_cell_size) * grid_cell_size;
                     n->block.h = grid_cell_size;
                     n->block.w = grid_cell_size;
+                    n->next = NULL;
 
                     if (counter == 0)
                     {
@@ -74,9 +75,7 @@ int main(void)
                     switch (event.key.keysym.scancode)
                     {
                         case SDL_SCANCODE_RETURN:
-                            // finish linked list
-                            list->next = NULL;
-                            list = headNode;
+                            // start the game
                             drawblocks = 1; 
                             break;
                     }
@@ -102,9 +101,9 @@ int main(void)
         }
 
         // draw the blocks
-        if (drawblocks)
+        if (counter)
         {
-            for (blocks *tmp = list; tmp != NULL; tmp = tmp->next)
+            for (blocks *tmp = headNode; tmp != NULL; tmp = tmp->next)
             {
                 SDL_SetRenderDrawColor(rend, grid_cursor_color.r, grid_cursor_color.g, grid_cursor_color.b, grid_cursor_color.a);
                 SDL_RenderFillRect(rend, &tmp->block);
