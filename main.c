@@ -12,52 +12,37 @@ int grid_cell_size = 14;
 int grid_height = 47;
 int grid_width = 85;
 
-blocks checkneighbors(blocks *headNode)
+void checkneighbors(blocks *headNode, int checkreproduce)
 {
     // create a linked list of all the neighbors
     // create a list of all the neighbors that will survivors
     blocks *livinghead, *n, *livinglist;
 
-    for (blocks *tmp = headNode; tmp != NULL; tmp = tmp->next)
+    for (blocks *curtmp = headNode; curtmp != NULL; curtmp = curtmp->next)
     {
         int counter = 0;
         int numofneighbors = 0;
-        int curblockx = tmp->block.x;
-        int curblocky = tmp->block.y;
-        int top = curblocky - grid_cell_size;
-        int right = curblockx + grid_cell_size;
-        int bottom = curblocky + grid_cell_size;
-        int left = curblockx - grid_cell_size;
+        int curblockx = curtmp->block.x;
+        int curblocky = curtmp->block.y;
 
         for (blocks *tmp = headNode; tmp != NULL; tmp = tmp->next)
         {
-            // find top neighbor
-            if (tmp->block.y == top && tmp->block.x == curblockx)
-                numofneighbors++;
-            // find right neighbor
-            if (tmp->block.x == right && tmp->block.y == curblocky)
-                numofneighbors++;
-            // find bottom neighbor
-            if (tmp->block.y == bottom && tmp->block.x == curblockx)
-                numofneighbors++;
-            // find left neighbor
-            if (tmp->block.x== left && tmp->block.y == curblocky)
-                numofneighbors++;
-            // find top left neighbor
-            if (tmp->block.x == left && tmp->block.y == top)
-                numofneighbors++;
-            // top right neighbr
-            if (tmp->block.x == right && tmp->block.y == top)
-                numofneighbors++;
-            // bottom right neighbor
-            if (tmp->block.x == right && tmp->block.y == bottom)
-                numofneighbors++;
-            // bottom left neighbor
-            if (tmp->block.x == left && tmp->block.y == bottom)
-                numofneighbors++;
+            // loop through the surrounding squares
+            for (int x = curblockx - grid_cell_size; x <= curblockx+grid_cell_size; x += grid_cell_size)
+            {
+                for (int y = curblocky - grid_cell_size; y <= curblocky+grid_cell_size; y += grid_cell_size)
+                {
+                    //printf("X: %i  Y: %i\n", x, y);
+                    //printf("Current block X: %i  Current block y: %i\n", curblockx, curblocky);
+                    if (x == tmp->block.x && y == tmp->block.y)
+                    {
+                        numofneighbors++;
+                    }
+                }
+            }
         }
 
-        if (numofneighbors == 2 || numofneighbors == 3)
+        /*if (numofneighbors == 2 || numofneighbors == 3)
         {
             n = malloc(sizeof(blocks));
             n->block.x = tmp->block.x;
@@ -77,8 +62,11 @@ blocks checkneighbors(blocks *headNode)
                 livinglist = n;
             }
         }
+        */
+       // have to subtract 1 because for loops add a neighbor when it sees the current blocks
+       printf("Number of neighbors: %i\n", numofneighbors - 1);
     }
-    return *livinghead;
+    //return *livinghead;
 }
 
 int main(void)
@@ -146,8 +134,7 @@ int main(void)
                         case SDL_SCANCODE_RETURN:
                             // start the game
                             list = headNode;
-                            checkneighbors(headNode);
-                            drawblocks = 1; 
+                            checkneighbors(headNode, 0);
                             break;
                     }
                     break;
