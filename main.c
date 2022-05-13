@@ -8,12 +8,78 @@ typedef struct blocks
 }
 blocks;
 
+int grid_cell_size = 14;
+int grid_height = 47;
+int grid_width = 85;
+
+int checkneighbors(blocks *headNode)
+{
+    // create a linked list of all the neighbors
+    // create a list of all the neighbors that will survivors
+
+    for (blocks *tmp = headNode; tmp != NULL; tmp = tmp->next)
+    {
+        int numofneighbors = 0;
+        int curblockx = tmp->block.x;
+        int curblocky = tmp->block.y;
+        int top = curblocky - grid_cell_size;
+        int right = curblockx + grid_cell_size;
+        int bottom = curblocky + grid_cell_size;
+        int left = curblockx - grid_cell_size;
+
+        for (blocks *tmp = headNode; tmp != NULL; tmp = tmp->next)
+        {
+            if (tmp->block.y == top && tmp->block.x == curblockx)
+            {
+                printf("found a top neighbor\n");
+                numofneighbors++;
+            }
+            if (tmp->block.x == right && tmp->block.y == curblocky)
+            {
+                printf("found a right neighbor\n");
+                numofneighbors++;
+            }
+            if (tmp->block.y == bottom && tmp->block.x == curblockx)
+            {
+                printf("found a bottom neighbor\n");
+                numofneighbors++;
+            }
+            if (tmp->block.x== left && tmp->block.y == curblocky)
+            {
+                printf("found a left neighbor\n");
+                numofneighbors++;
+            }
+            // find top left neighbor
+            if (tmp->block.x == left && tmp->block.y == top)
+            {
+                printf("Found top left neighbor\n");
+                numofneighbors++;
+            }
+            // top right neighbr
+            if (tmp->block.x == right && tmp->block.y == top)
+            {
+                printf("Found a top right neighbor\n");
+                numofneighbors++;
+            }
+            // bottom right neighbor
+            if (tmp->block.x == right && tmp->block.y == bottom)
+            {
+                printf("Found a bottm right neighbor\n");
+                numofneighbors++;
+            }
+            // bottom left neighbor
+            if (tmp->block.x == left && tmp->block.y == bottom)
+            {
+                printf("found a bottom left neighbor\n");
+                numofneighbors++;
+            }
+        }
+        printf("Num of neighbors: %i\n", numofneighbors);
+    }
+}
+
 int main(void)
 {
-    int grid_cell_size = 14;
-    int grid_height = 47;
-    int grid_width = 85;
-
     int WIN_H = (grid_height * grid_cell_size) + 1;
     int WIN_W = (grid_width * grid_cell_size) + 1;
 
@@ -76,6 +142,8 @@ int main(void)
                     {
                         case SDL_SCANCODE_RETURN:
                             // start the game
+                            list = headNode;
+                            checkneighbors(headNode);
                             drawblocks = 1; 
                             break;
                     }
@@ -109,6 +177,9 @@ int main(void)
                 SDL_RenderFillRect(rend, &tmp->block);
             }
         }
+
+        // game logic
+
         SDL_RenderPresent(rend);
     }
 
