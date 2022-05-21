@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 
 typedef struct blocks
@@ -12,9 +13,69 @@ int grid_cell_size = 14;
 int grid_height = 47;
 int grid_width = 85;
 
-void checkneighbors(blocks *headNode)
+blocks* checkneighbors(blocks *headNode)
 {
-    
+    int counter = 0;
+    bool nexists = false;
+    blocks *newhead, *n, *list;
+    for (int x = 0; x <= grid_cell_size * grid_width; x += grid_cell_size)
+    {
+        for (int y = 0; y <= grid_cell_size * grid_height; y += grid_cell_size)
+        {
+            int numofneighbors = 0;
+            bool alreadyalive = false;
+            // check if current block is in the list (alive)
+            for (blocks *tmp = headNode; tmp != NULL; tmp = tmp->next)
+            {
+                if (x == tmp->block.x && y == tmp->block.y)
+                    alreadyalive = true;
+            }
+            // check surrounding blocks
+            for (int i = x - grid_cell_size; i <= x + grid_cell_size; i += grid_cell_size)
+            {
+                for (int j = y - grid_cell_size; j <= y + grid_cell_size; j += grid_cell_size)
+                {
+                    // check if surrounding blocks are in the list
+                    for (blocks *tmp = headNode; tmp != NULL; tmp = tmp->next)
+                    {
+                        if (i == tmp->block.x && j == tmp->block.y)
+                            numofneighbors += 1;
+                    }
+                }
+            }
+            // need to delete one neighbor because it counts itself
+            if (alreadyalive) numofneighbors--;
+
+            if (alreadyalive && numofneighbors == 2 || alreadyalive && numofneighbors == 3 
+                    || !alreadyalive && numofneighbors == 3)
+            {
+                // add to new linked list
+                n = malloc(sizeof(blocks));
+                n->block.x = x;
+                n->block.y = y;
+                n->block.h = grid_cell_size;
+                n->block.w = grid_cell_size;
+                n->next = NULL;
+                nexists = true;
+            }
+
+            // need to make sure there's a block to add to the list
+            if (counter == 0 && nexists)
+            {
+                newhead = list = n;
+                counter = 1;
+                nexists = false;
+            }
+            else if (counter == 1 && nexists)
+            {
+                list->next = n;
+                list = n;
+                nexists = false;
+            }
+        }
+    }    
+
+    return newhead;
 }
 
 int main(void)
@@ -42,7 +103,6 @@ int main(void)
     }
 
     blocks *headNode, *n, *list;
-    blocks newhead;
 
     int close_requested = 0;
     int counter = 0;
@@ -82,7 +142,6 @@ int main(void)
                     {
                         case SDL_SCANCODE_RETURN:
                             // start the game
-                            checkneighbors(headNode);
                             startgame = 1;
                             break;
                     }
@@ -120,11 +179,11 @@ int main(void)
         // game logic
         if (startgame)
         {
-            //checkneighbors(headNode);
+            headNode = checkneighbors(headNode);
         }
 
         SDL_RenderPresent(rend);
-        SDL_Delay(1000/10);
+        SDL_Delay(1000/4);
     }
 
     SDL_DestroyRenderer(rend);
