@@ -12,61 +12,9 @@ int grid_cell_size = 14;
 int grid_height = 47;
 int grid_width = 85;
 
-void checkneighbors(blocks *headNode, int checkreproduce)
+void checkneighbors(blocks *headNode)
 {
-    // create a linked list of all the neighbors
-    // create a list of all the neighbors that will survivors
-    blocks *livinghead, *n, *livinglist;
-
-    for (blocks *curtmp = headNode; curtmp != NULL; curtmp = curtmp->next)
-    {
-        int counter = 0;
-        int numofneighbors = 0;
-        int curblockx = curtmp->block.x;
-        int curblocky = curtmp->block.y;
-
-        for (blocks *tmp = headNode; tmp != NULL; tmp = tmp->next)
-        {
-            // loop through the surrounding squares
-            for (int x = curblockx - grid_cell_size; x <= curblockx+grid_cell_size; x += grid_cell_size)
-            {
-                for (int y = curblocky - grid_cell_size; y <= curblocky+grid_cell_size; y += grid_cell_size)
-                {
-                    //printf("X: %i  Y: %i\n", x, y);
-                    //printf("Current block X: %i  Current block y: %i\n", curblockx, curblocky);
-                    if (x == tmp->block.x && y == tmp->block.y)
-                    {
-                        numofneighbors++;
-                    }
-                }
-            }
-        }
-
-        /*if (numofneighbors == 2 || numofneighbors == 3)
-        {
-            n = malloc(sizeof(blocks));
-            n->block.x = tmp->block.x;
-            n->block.y = tmp->block.y;
-            n->block.h = grid_cell_size;
-            n->block.w = grid_cell_size;
-            n->next = NULL;
-
-            if (counter == 0)
-            {
-                livinghead = livinglist = n;
-                counter = 1;
-            }
-            else
-            {
-                livinglist->next = n;
-                livinglist = n;
-            }
-        }
-        */
-       // have to subtract 1 because for loops add a neighbor when it sees the current blocks
-       printf("Number of neighbors: %i\n", numofneighbors - 1);
-    }
-    //return *livinghead;
+    
 }
 
 int main(void)
@@ -94,10 +42,11 @@ int main(void)
     }
 
     blocks *headNode, *n, *list;
+    blocks newhead;
 
     int close_requested = 0;
     int counter = 0;
-    int drawblocks = 0;
+    int startgame = 0;
     while (!close_requested)
     {
         // process events
@@ -133,8 +82,8 @@ int main(void)
                     {
                         case SDL_SCANCODE_RETURN:
                             // start the game
-                            list = headNode;
-                            checkneighbors(headNode, 0);
+                            checkneighbors(headNode);
+                            startgame = 1;
                             break;
                     }
                     break;
@@ -169,9 +118,13 @@ int main(void)
         }
 
         // game logic
-
+        if (startgame)
+        {
+            //checkneighbors(headNode);
+        }
 
         SDL_RenderPresent(rend);
+        SDL_Delay(1000/10);
     }
 
     SDL_DestroyRenderer(rend);
